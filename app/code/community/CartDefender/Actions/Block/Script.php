@@ -84,10 +84,12 @@ class CartDefender_Actions_Block_Script extends Mage_Core_Block_Template
                 ->ensureCorrelationIdSet();
 
             $cdsvarData = array(
+                'api' => Mage::helper('actions')->getApi(),
                 'website_url' =>
                     Mage::getStoreConfig('web/unsecure/base_url', 0),
                 'app_software_name' => 'Magento ' . Mage::getEdition(),
                 'app_software_version' => Mage::getVersion(),
+                'website_id' => $website->getId(),
                 'website_code' => $website->getCode(),
                 'website_name' => $website->getName(),
                 'website_default_shop_id' => $website->getDefaultGroupId(),

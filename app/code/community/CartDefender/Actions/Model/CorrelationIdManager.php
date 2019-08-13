@@ -18,7 +18,12 @@ class CartDefender_Actions_Model_CorrelationIdManager extends Varien_Object
      * The name of the cookie storing the CartDefender correlation id.
      */
     const CD_CORRELATION_COOKIE_NAME = "__cd_732655870348746856";
-
+  
+    /**
+     * The name of the request header storing the CartDefender correlation id.
+     */
+    const CD_CORRELATION_HEADER_NAME = "X_CD_732655870348746856";
+    
     /**
      * @var string|null $correlationId The CartDefender id used for correlating
      *     web and business events.
@@ -101,9 +106,15 @@ class CartDefender_Actions_Model_CorrelationIdManager extends Varien_Object
         }
 
         $cookie = Mage::getSingleton('core/cookie');
-        $corrCookie = $cookie->get(self::CD_CORRELATION_COOKIE_NAME);
-        $this->correlationId = $corrCookie ?: $this->generateCorrelationId();
-        if (!$corrCookie) {
+        $corrIdExternal = $cookie->get(self::CD_CORRELATION_COOKIE_NAME);
+        if (!$corrIdExternal) {
+            // Take id from header if not present on cookie
+            $corrIdExternal = Mage::app()->getRequest()->getHeader(self::CD_CORRELATION_HEADER_NAME);
+        }
+        // If Correlation ID was not provided, generate it.
+        $this->correlationId = $corrIdExternal ?: $this->generateCorrelationId();
+        $phpSessionId = session_id();
+        if (!$corrIdExternal && !empty($phpSessionId)) {
             $this->setCorrelationIdCookie();
             // Notify CD servers of new correlation id.
             $this->sender->sendEvent(
@@ -112,11 +123,13 @@ class CartDefender_Actions_Model_CorrelationIdManager extends Varien_Object
             );
         }
 
-        $this->logger->log(
-            'CorrelationIdManager->ensureCorrelationIdSet',
-            'Correlation id [' . $this->correlationId . '] '
-            . ($corrCookie ? 'taken from' : 'created, set on new') . ' cookie.'
-        );
+        if ($this->correlationId) {
+            $this->logger->log(
+                'CorrelationIdManager->ensureCorrelationIdSet',
+                'Correlation id [' . $this->correlationId . '] '
+                . ($corrIdExternal ? 'taken from' : 'created, set on new') . ' cookie or header.'
+            );
+        }
 
         return $this->correlationId;
     }

@@ -59,7 +59,9 @@ class CartDefender_Actions_Model_Observer extends Varien_Event_Observer
      */
     public function captureEvent($observer)
     {
-        if (!Mage::helper('actions')->isCDEnabledAndRequestNonLocalNonAdmin()) {
+        $phpSessionId = session_id();
+        if (!Mage::helper('actions')->isCDEnabledAndRequestNonLocalNonAdmin()
+            || empty($phpSessionId)) {
             return;
         }
         $this->logger->log('Observer->captureEvent');
