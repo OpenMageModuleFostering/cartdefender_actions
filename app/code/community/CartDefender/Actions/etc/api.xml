@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<config>
+   <api>
+     <resources>
+       <cartdefender_product_feed>
+            <model>actions/api</model>
+            <title>Cart Defender's product feed API</title>
+            <acl>cartdefender</acl>
+            <methods>
+              <export translate="title" module="actions">
+                <title>Retrieve store's products</title>
+                <method>export</method>
+              </export>
+              <getVersion translate="title" module="actions">
+                  <title>Retrieve store's products</title>
+                  <method>getVersion</method>
+              </getVersion>
+            </methods>
+       </cartdefender_product_feed>
+
+    </resources>
+    <v2>
+      <resources_function_prefix>
+           <cartdefender_product_feed>cartdefender_productFeed</cartdefender_product_feed>
+      </resources_function_prefix>
+    </v2>
+    <acl>
+       <resources>
+           <cartdefender translate="title" module="actions">
+              <title>Cart Defender product feed data</title>
+           <product_export translate="title" module="actions">
+            <title>Product export</title>
+           </product_export>
+           </cartdefender>
+       </resources>
+    </acl>
+  </api>
+</config>

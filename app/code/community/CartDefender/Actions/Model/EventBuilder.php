@@ -66,6 +66,11 @@ class CartDefender_Actions_Model_EventBuilder
         );
         $done = array();
         $utf8izedEvent = Mage::helper('actions')->utf8ize($event, $done);
+        $logger = Mage::helper('actions/logger');
+        $logger->log(
+            'EventBuilder->buildEvent',
+            'Built event: ' . $eventName
+        );
         return Zend_Json::encode($utf8izedEvent, true);
     }
 
@@ -133,16 +138,45 @@ class CartDefender_Actions_Model_EventBuilder
             $cartData = $this->removePersonalData($quote->getData());
             $productMediaConfig = Mage::getModel('catalog/product_media_config');
             $items = $quote->getAllVisibleItems();
+            $productIds = array();
             foreach ($items as $item) {
                 $itemData = $item->getData();
                 $productFromData = $itemData['product'];
-                $productUrl = Mage::getUrl($productFromData->getUrlPath(), array('_secure' => true, '_type' => 'direct_link'));
-                $itemData['product_url'] = $productUrl;
-                $itemData['base_image_url'] = $productMediaConfig->getMediaUrl($productFromData->getImage());
-                $itemData['small_image_url'] = $productMediaConfig->getMediaUrl($productFromData->getSmallImage());
-                $itemData['thumbnail_url'] = $productMediaConfig->getMediaUrl($productFromData->getThumbnail());
-                $itemData['product_data'] = $productFromData->getData();
+                $productIds[] = $productFromData->getId();
                 $cartItems[] = $itemData;
+            }
+            if (! empty($productIds)) {
+                Mage::getResourceModel('catalog/product_collection')->setStore($storeId);
+                $collection = Mage::getResourceModel('catalog/product_collection');
+                
+                $prodCollection = Mage::getModel('catalog/product')->getCollection()
+                    ->setStore(Mage::app()->getStore()->getStoreId())
+                    ->addAttributeToSelect('entity_id')
+                    ->addAttributeToSelect('meta_title')
+                    ->addAttributeToSelect('name')
+                    ->addAttributeToSelect('short_description')
+                    ->addAttributeToSelect('price')
+                    ->addAttributeToSelect('final_price')
+                    ->addAttributeToSelect('image')
+                    ->addAttributeToSelect('small_image')
+                    ->addAttributeToSelect('thumbnail')
+                    ->addAttributeToSelect('product_url')
+                    ->addFieldToFilter('entity_id', array('in' => array(array_unique($productIds))
+                        ));
+                    
+                    $prodInfo = array();
+                
+                foreach ($prodCollection as $prodData) {
+                    $prodData->setStoreId(Mage::app()->getStore()->getStoreId());
+                    $productUrl = $prodData->getProductUrl();
+                    $prodArray = $prodData->getData();
+                    $prodArray['cd_product_url'] = $productUrl;
+                    $prodArray['cd_base_image_url'] = $productMediaConfig->getMediaUrl($prodData->getImage());
+                    $prodArray['cd_small_image_url'] = $productMediaConfig->getMediaUrl($prodData->getSmallImage());
+                    $prodArray['cd_thumbnail_url'] = $productMediaConfig->getMediaUrl($prodData->getThumbnail());
+                    $prodInfo[] = $prodArray;
+                }
+                $cartData['cd_all_products_info'] = $prodInfo;
             }
         } else {
             $quote = CDData::MISSING_VALUE;

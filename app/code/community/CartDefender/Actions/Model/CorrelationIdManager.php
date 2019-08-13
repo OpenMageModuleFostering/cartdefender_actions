@@ -110,12 +110,22 @@ class CartDefender_Actions_Model_CorrelationIdManager extends Varien_Object
         if (!$corrIdExternal) {
             // Take id from header if not present on cookie
             $corrIdExternal = Mage::app()->getRequest()->getHeader(self::CD_CORRELATION_HEADER_NAME);
+            $this->logger->log(
+                'CorrelationIdManager->ensureCorrelationIdSet', 'Taken from header, not from cookie'
+                . ' Correlation ID: '. $this->correlationId
+                . ' PHP Session ID: '. session_id()
+            );
         }
         // If Correlation ID was not provided, generate it.
         $this->correlationId = $corrIdExternal ?: $this->generateCorrelationId();
         $phpSessionId = session_id();
         if (!$corrIdExternal && !empty($phpSessionId)) {
             $this->setCorrelationIdCookie();
+            $this->logger->log(
+                    'CorrelationIdManager->ensureCorrelationIdSet', 'Generated and set on cookie'
+                    . ' Correlation ID: '. $this->correlationId
+                    . ' PHP Session ID: '. session_id()
+            );
             // Notify CD servers of new correlation id.
             $this->sender->sendEvent(
                 CDData::START_OF_SESSION,

@@ -64,6 +64,11 @@ class CartDefender_Actions_CartDefenderSenderController
     {
         $settings = Mage::helper('actions')->getSettings();
         $request = $this->getRequest();
+        $this->logger->log(
+                'CartDefenderSenderController->sendAction',
+                'Received request with Correlation ID: ' . $request->getPost('correlation_id')
+                . ' PHP Session ID: ' . session_id()
+                );
         if ($this->isRequestAllowed($request, $settings)) {
             $millisBefore = round(microtime(true) * 1000);
 
@@ -79,15 +84,23 @@ class CartDefender_Actions_CartDefenderSenderController
                 . ' Url: ' . $this->getUrl($settings)
                 . ' Request time: ' . $millisBefore
                 . ' Request latency: ' . ($millisAfter - $millisBefore)
+                . ' Status code: ' . $response->getStatus()
+                . ' Correlation ID: ' . $request->getPost('correlation_id')
+                . ' PHP Session ID: ' . session_id()
             );
         } else {
             $this->logger->log(
                 'CartDefenderSenderController->sendAction',
-                'Error - request not allowed.'
+                'Error - request not allowed. ' 
+                . 'Correlation ID: ' . $request->getPost('correlation_id')
+                . 'PHP Session ID: ' . session_id()
             );
             exit;
         }
-        $this->logger->log('CartDefenderSenderController->sendAction', 'Done');
+        $this->logger->log('CartDefenderSenderController->sendAction', 'Done'
+                . 'Correlation ID: ' . $request->getPost('correlation_id')
+                . 'PHP Session ID: ' . session_id()        
+        );
         echo 'Done';
         exit;
     }
@@ -137,10 +150,11 @@ class CartDefender_Actions_CartDefenderSenderController
     private function sendRequest($request, $settings)
     {
         $client = new Varien_Http_Client($this->getUrl($settings));
+        $client->setConfig(array('strictredirects' => true));
         $client->setMethod(Varien_Http_Client::POST);
         $client->setAuth($settings['api'], '', Zend_Http_Client::AUTH_BASIC);
         $client->setRawData($request->getPost('data'));
         $client->setEncType('application/json');
-        return $client->request();
+        return $client->request('POST');
     }
 }

@@ -44,7 +44,7 @@
                             <sort_order>1</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_store>0</show_in_store>
                         </enabled>
                         <api translate="label">
                             <label>API key</label>
@@ -52,33 +52,65 @@
                             <sort_order>2</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_store>0</show_in_store>
                         </api>
-                        <send_key translate="label">
-                            <label>Generated internal request key</label>
-                            <frontend_type>text</frontend_type>
+                        <transport_method translate="label">
+                            <label>Select how data is sent to Cart Defender</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>actions/system_config_source_transport</source_model>
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>0</show_in_website>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment><![CDATA[ <p>Please select the method that will work best in your system:</p>
+                             <p>CURL requires access to the exec() function to fork a separate process.</p>
+                             <p>Async PHP script relies on a separate Controller which sends data to Cart Defender.</p>
+                             <p>Synchronous PHP is encouraged when testing the connection.</p>
+                              ]]>
+                             </comment>
+                        </transport_method>
+                        <sender_controller_url translate="label">
+                            <label>Cart Defender Sender Controller URL (auto-populated)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>4</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends><transport_method>Async PHP script</transport_method></depends>
+                            <comment><![CDATA[ <p>This is the URL of the internal Async PHP controller. It is populated automatically if left blank.
+                            Afterwards, changes might be required to tweak the URL according to your website setup.</p>
+                              ]]>
+                             </comment>
+                        </sender_controller_url>
+                        <send_key translate="label">
+                            <label>Internal request key (generated)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>5</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
                         </send_key>
                         <test translate="label">
                             <label>Test mode</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>4</sort_order>
+                            <sort_order>6</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_store>0</show_in_store>
+                            <comment><![CDATA[ <p>Test mode enables logging (into a separate file: cartdefender.log) 
+                            and allows to configure the URL where the data is send to.</p>
+                              ]]>
+                             </comment>
                         </test>
                         <!-- Don't use a trailing slash in test server URL.-->
                         <test_server_url_start>
-                            <label>Send data to this URL: protocol, domain, and path prefix if any (e.g. http://localhost)</label>
+                            <label>Send data to this target URL: protocol, domain, and path prefix if any (e.g. http://localhost)</label>
                             <frontend_type>text</frontend_type>
-                            <sort_order>5</sort_order>
+                            <sort_order>7</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_store>0</show_in_store>
                             <depends><test>1</test></depends>
                         </test_server_url_start>
                         <!-- This setting controls if the "Test server URL" value is used exactly
@@ -89,10 +121,10 @@
                             <label>Use unadorned target server URL for JSON API</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>6</sort_order>
+                            <sort_order>8</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_store>0</show_in_store>
                             <depends><test>1</test></depends>
                         </use_raw_test_url_for_biz_api>
                     </fields>

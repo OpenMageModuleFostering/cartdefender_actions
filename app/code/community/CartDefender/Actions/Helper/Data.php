@@ -136,6 +136,47 @@ class CartDefender_Actions_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * Obtains the url to access the synchronous
+     * sender PHP script, used to send business events to Cart Defender
+     * servers.
+     *
+     * @return string URL needed to access the sender script.
+     */
+    public function getSenderControllerUrl()
+    {
+        $senderControllerUrl = Mage::getStoreConfig('actions/settings/sender_controller_url');
+        if (empty($senderControllerUrl)) {
+            $senderControllerUrl = Mage::getUrl(
+                'cartdefender/CartDefenderSender/send',
+                array('_secure' => true)
+            );
+            Mage::getConfig()->saveConfig(
+                    'actions/settings/sender_controller_url',
+                    $senderControllerUrl,
+                    'default',
+                    0
+                    );
+        }
+        return $senderControllerUrl;
+    }
+    
+    /**
+     * Obtains the selected transport method for store's data
+     *
+     * @return string code name of the selected transport method
+     */
+    public function getTransportMethod()
+    {
+    	  $transportMethod = Mage::getStoreConfig('actions/settings/transport_method');
+    	  if (empty($transportMethod)) {
+    	  	  $transportMethod = CartDefender_Actions_Model_System_Config_Source_Transport::CURL_PROCESS;
+    	  	  Mage::getConfig()->saveConfig('actions/settings/transport_method', $transportMethod, 'default', 0);
+    	  }
+        return $transportMethod;
+    }
+    
+    
+    /**
      * Returns an array containing Cart Defender configuration settings.
      *
      * @return array Cart Defender configuration settings.
@@ -153,7 +194,9 @@ class CartDefender_Actions_Helper_Data extends Mage_Core_Helper_Abstract
                 'test_server_url_start' => $this->getTestServerUrlStart(),
                 'use_raw_test_url_for_biz_api' =>
                     $this->getUseRawTestUrlForBizApi(),
-                'send_key' => $this->getSendKey()
+                'send_key' => $this->getSendKey(),
+                'sender_controller_url' => $this->getSenderControllerUrl(),
+                'transport_method' => $this->getTransportMethod()
             );
         }
         return $data;

@@ -29,7 +29,7 @@ class CartDefender_Actions_Helper_Logger extends Mage_Core_Helper_Abstract
             $this->enabled = ($settings ? $settings['test'] : null);
         }
         if ($this->enabled) {
-            Mage::log('[CD] [' . $function . '] ' . $message);
+            Mage::log('[CD] [' . $function . '] ' . $message, null, 'cartdefender.log');
         }
     }
 }

@@ -42,10 +42,16 @@ class CartDefender_Actions_Model_EventAsyncLocalSender
             $data,
             $sequenceNo
         );
+        $millisBefore = round(microtime(true) * 1000);
         $this->send($event, $sequenceNo, $correlationId);
+        $millisAfter = round(microtime(true) * 1000);
+        
         $this->logger->log(
-            'EventAsyncLocalSender->sendEvent',
-            'Sent event: ' . $eventName
+            'EventAsyncLocalSender->sendEvent', ' Correlation ID: '. $correlationId 
+            . ' PHP Session ID: '. session_id()
+            . ' Sent event: ' . $eventName
+            . ' Request time: ' . $millisBefore
+            . ' Request latency: ' . ($millisAfter - $millisBefore)
         );
     }
 }

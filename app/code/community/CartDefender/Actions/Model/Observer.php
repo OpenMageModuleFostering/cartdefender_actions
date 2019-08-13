@@ -50,9 +50,9 @@ class CartDefender_Actions_Model_Observer extends Varien_Event_Observer
     }
 
     /**
-     * Main event observer function.
+     * Main event observer function for selected Magento events.
      *
-     * List of events: http://www.nicksays.co.uk/magento-events-cheat-sheet-1-7/
+     * FYI, full list of events: http://www.nicksays.co.uk/magento-events-cheat-sheet-1-7/
      *
      * @param object $observer event data.
      * @return void
@@ -150,7 +150,10 @@ class CartDefender_Actions_Model_Observer extends Varien_Event_Observer
         $result = empty($lastEventAt)
             || (($now - $lastEventAt) > self::EVENT_TIME_THRESHOLD);
 
-        $this->logger->log('Observer->isLongSinceLastEvent', 'Result: '
+        $this->logger->log('Observer->isLongSinceLastEvent', ' Correlation ID: '
+            . $this->correlationIdMgr->getCorrelationId()
+            . ' PHP Session ID: '. session_id()
+            . 'Result: '
             . ($result ? 'Y' : 'N') . ' Time diff: '
             . ($lastEventAt ? ($now - $lastEventAt): 'N/A'));
         return $result;
