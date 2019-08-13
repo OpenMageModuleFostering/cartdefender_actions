@@ -1,20 +1,18 @@
 <?xml version="1.0"?>
 <package>
     <name>cartdefender_actions</name>
-    <version>1.1.1</version>
+    <version>1.1.3</version>
     <stability>stable</stability>
     <license uri="http://opensource.org/licenses/osl-3.0.php">Open Software License (OSL)</license>
     <channel>community</channel>
     <extends/>
     <summary>Increase sales with smart targeted popups and offers delivered to your visitors in real time.</summary>
-    <description>You can instantly use messages and offers which convert your visitors into customers. You focus on your business needs without A/B tests, as Cart Defender learns which popups covert the best and adjusts itself automatically.</description>
-    <notes>Improve handling of non-UTF8 charsets in later PHP versions.&#xD;
-Enhance configuration page with links to Cart Defender Portal and registration page&#xD;
-</notes>
+    <description>You can instantly use messages and offers which convert your visitors into customers. You focus on your business needs without A/B tests, as Cart Defender learns which popups convert the best and adjusts itself automatically.</description>
+    <notes>No-op refactors and minor bugfixes.</notes>
     <authors><author><name>Radoslaw Gliniecki</name><user>Cart_Defender</user><email>radek@cartdefender.com</email></author><author><name>Jan Zankowski</name><user>janzankowski</user><email>jan@cartdefender.com</email></author><author><name>Przemyslaw Gliniecki</name><user>psgliniecki</user><email>psg@cartdefender.com</email></author></authors>
-    <date>2016-07-29</date>
-    <time>11:56:23</time>
-    <contents><target name="magecommunity"><dir name="CartDefender"><dir name="Actions"><dir name="Block"><file name="Script.php" hash="6879aeda8fa9d464124915992a761d00"/></dir><dir name="Helper"><file name="Data.php" hash="3b85a232191fa48f1487687c95c371fc"/></dir><dir name="Model"><file name="Observer.php" hash="f05d5a34beef7ec1f743ba4053321caf"/></dir><dir name="controllers"><file name="CartDefenderSenderController.php" hash="aef1db479967b4cc35623dc34e3979b7"/></dir><dir name="etc"><file name="config.xml" hash="220f0ff171665eb589b24b389fd2787a"/><file name="system.xml" hash="19f9087cbe9e92edde8372abe20f1354"/></dir></dir></dir></target><target name="mageetc"><dir name="modules"><file name="CartDefender_Actions.xml" hash="e0458c6a3a4e1ae4210d523e8fcdd6fb"/></dir></target><target name="magedesign"><dir name="frontend"><dir name="base"><dir name="default"><dir name="template"><dir name="actions"><file name="script.phtml" hash="c25ad0d5fcdec392e8a69dc489667a91"/></dir></dir><dir name="layout"><file name="actions.xml" hash="ec83d87d66ef40a87b00bd0851be610f"/></dir></dir></dir></dir></target></contents>
+    <date>2016-10-27</date>
+    <time>20:04:27</time>
+    <contents><target name="magecommunity"><dir name="CartDefender"><dir name="Actions"><dir name="Block"><file name="Script.php" hash="b234814d8cd363bcb22c3f9ed33bb80b"/></dir><dir name="Helper"><file name="Data.php" hash="dd4057deaaa8b0bdcfcc3e6f7c31091c"/><file name="Logger.php" hash="f21b3aed521b3761a890b22ba0f247a9"/></dir><dir name="Model"><file name="AsyncLocalSender.php" hash="f4df465d8bba0799a5381b50e7fe244f"/><file name="CorrelationIdManager.php" hash="427b1999971c28ee4a5dc39d6c158be1"/><file name="EventAsyncLocalSender.php" hash="cd9a25e21225cb1966da47fbbc8f9854"/><file name="EventBuilder.php" hash="d814e3b3c947e5a4815b43ba268a9b87"/><file name="Observer.php" hash="b6e3237c696a417557fa7a3a98b75358"/></dir><dir name="controllers"><file name="CartDefenderSenderController.php" hash="2932402af887cac75255758c7fd4da34"/></dir><dir name="etc"><file name="config.xml" hash="b6332ca2c6038b906edb525d1cf4df71"/><file name="system.xml" hash="3a0ef9f8ca4414d7714e717a64816a33"/></dir></dir></dir></target><target name="mageetc"><dir name="modules"><file name="CartDefender_Actions.xml" hash="f9e77235e41f79ac086160ef2e494837"/></dir></target><target name="magedesign"><dir name="frontend"><dir name="base"><dir name="default"><dir name="template"><dir name="actions"><file name="script.phtml" hash="aa322fad9cd04ae7c910936e043fa8f1"/></dir></dir><dir name="layout"><file name="actions.xml" hash="e6a4b2f6d8132a833a1b5f8b9fce7166"/></dir></dir></dir></dir></target></contents>
     <compatible/>
     <dependencies><required><php><min>5.3.0</min><max>6.0.0</max></php><package><name>Mage_Core_Modules</name><channel>community</channel><min>1.7.0.2</min><max>1.9.2.4</max></package><extension><name>openssl</name><min>0.9.6</min><max>1.0.1</max></extension></required></dependencies>
 </package>

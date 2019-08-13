@@ -1,23 +1,23 @@
 <?php
 /**
- * Actions plugin for Magento 
+ * Actions plugin for Magento
  *
  * @package     CartDefender_Actions
- * @author      Heptium Ltd. 
+ * @author      Heptium Ltd.
  * @copyright   Copyright (c) 2016 Heptium Ltd.  (http://www.cartdefender.com/)
  * @license     Open Software License
  */
 ?>
 
 <?php if ($this->getSetting('enabled')) { ?>
-  <?php if ($this->getSetting('test')) { ?>
-    <p> Cart Defender Actions module is running in TEST MODE. </p>
-  <?php } ?>
-  <script type='text/javascript'>
-    /* <![CDATA[ */
-    var cdsvar = <?php echo $this->getVariables(); ?>;
-    /* ]]> */
-  </script>
-  <script type="text/javascript" src=<?php echo $this->getJavaScriptUrl(); ?> >
-  </script> 
+    <?php if ($this->getSetting('test')) { ?>
+        <p> Cart Defender Actions module is running in TEST MODE. </p>
+    <?php } ?>
+    <script type='text/javascript'>
+        /* <![CDATA[ */
+        var cdsvar = <?php echo $this->getVariables(); ?>;
+        /* ]]> */
+    </script>
+    <script type="text/javascript" src=<?php echo $this->getJavaScriptUrl(); ?> >
+    </script>
 <?php } ?>

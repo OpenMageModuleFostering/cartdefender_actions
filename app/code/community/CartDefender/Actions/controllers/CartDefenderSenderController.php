@@ -1,82 +1,127 @@
 <?php
 
+use CartDefender_Actions_Helper_Data as CDData;
+
 /**
- * A script sending business events asynchronously to Cart Defender servers.
- * 
- * The main reason for this script is so that we can launch it not blocking the main
- * PHP process rendering the page for the user. If we blocked, the page rendering or
- * AJAX processing would be slowed down by the time it takes for the round-trips to
- * our servers (at least 3 in case of SSL - about 250 milliseconds for any transatlantic
- * connections).
+ * A script sending text data to Cart Defender servers. While it sends
+ * the data synchronously, it's meant to be used indirectly, via
+ * AsyncLocalSender. This other utility does pass the data to this script
+ * asynchronously, thus achieving non blocking behavior as far as
+ * the PHP process from which we wanted to send the data is concerned.
  *
- * @link       http://cartdefender.com
- * @since      0.0.1
+ * The reason for this setup is not blocking the PHP process rendering
+ * the page for the user. If we blocked, the page rendering or AJAX
+ * processing would be slowed down by the time it takes for the round-trips
+ * to our servers (at least 3 in case of SSL - about 250 milliseconds for
+ * transatlantic connections).
  *
  * @package     CartDefender_Actions
  * @author      Heptium Ltd.
  * @copyright   Copyright (c) 2016 Heptium Ltd. (http://www.cartdefender.com/)
  * @license     Open Software License
  */
-class CartDefender_Actions_CartDefenderSenderController extends Mage_Core_Controller_Front_Action {
+class CartDefender_Actions_CartDefenderSenderController
+    extends Mage_Core_Controller_Front_Action
+{
 
-  public function sendEventsAction() {
-    $settings = Mage::helper('actions')->getSettings();
-    // works only if flag is set to denote local API call and data exists
-    if (!empty($_POST['is_local_request']) 
-        && $settings['send_key'] === $_POST['send_key']  
-        && !empty($_POST['data']) 
-        && $settings['enabled']) {
-      $millis_before = round(microtime(true) * 1000);
-      
-      $data = $_POST['data'];
-      $options = array(
-          'http' => array(
-              'header' => "Content-type: application/json\r\n"
-                  . "Authorization: Basic " . base64_encode($settings['api'] . ":") . "\r\n",
-              'method' => 'POST',
-              'content' => $data));
-      $context = stream_context_create($options);
-      $url = $this->getUrl($settings);
-      $success = file_get_contents($url, false, $context);
-      
-      // Logging.
-      $millis_after = round(microtime(true) * 1000);
-      if (!$success) {
-        // These will appear in the general server logs. 
-        Mage::helper('actions')->log('[Cart Defender biz event sender ERROR]' 
-            . ' Event number: ' . $_POST['event_no']
-            . ' Url: ' . $url
-            . ' Request time: ' . $millis_before
-            . ' Request latency: ' . ($millis_after - $millis_before));
-      } else {
-        Mage::helper('actions')->log('[Cart Defender biz event sender success]'
-            . ' Event number: ' . $_POST['event_no']
-            . ' Url: ' . $url
-            . ' Request time: ' . $millis_before
-            . ' Request latency: ' . ($millis_after - $millis_before)
-            . ' Is local equest: ' . $_POST['is_local_request']);
-      }
-    } else {
-      Mage::helper('actions')->log('[Cart Defender biz event sender ERROR] '
-          . 'Not a local POST request with an event or disabled');
+    /**
+     * @var CartDefender_Actions_Helper_Logger $logger Logger of Cart Defender
+     *     specific messages.
+     */
+    private $logger;
+
+    /** Initializes this class, particularly the logger. */
+    public function _construct()
+    {
+        parent::_construct();
+        $this->logger = Mage::helper('actions/logger');
     }
-    Mage::helper('actions')->log('[Cart Defender biz event sender] Work done, time to finish.');
-    echo 'Done';
-  }
-  
-  /**
-   * Returns the URL to which business events should be sent.
-   */
-  private function getUrl($settings) {
-    $path = CartDefender_Actions_Helper_Data::CD_PLUGIN_BIZ_API_PATH_START
-        . '/' . $_POST['correlation_id'] . '/'
-        . CartDefender_Actions_Helper_Data::CD_PLUGIN_BIZ_API_VERSION
-        . CartDefender_Actions_Helper_Data::CD_PLUGIN_BIZ_API_PATH_END;
-    $use_raw_test_url = $settings['use_raw_test_url_for_biz_api'];
-    return $settings['test']
-        ? ($settings['test_server_url_start'] . ($use_raw_test_url ? '' : $path))
-        : (CartDefender_Actions_Helper_Data::CD_HOST . $path);
-  }
-}
 
-?>
+    /**
+     * Synchronously sends the text data contained in the POST request
+     * invoking this controller to the Cart Defender servers.
+     *
+     * @return void
+     */
+    public function sendAction()
+    {
+        $settings = Mage::helper('actions')->getSettings();
+        $request = $this->getRequest();
+        if ($this->isRequestAllowed($request, $settings)) {
+            $millisBefore = round(microtime(true) * 1000);
+
+            // This is where the biz event is actually sent.
+            $response = $this->sendRequest($request, $settings);
+
+            // Logging.
+            $millisAfter = round(microtime(true) * 1000);
+            $this->logger->log(
+                'CartDefenderSenderController->sendAction',
+                (($response->getStatus() == 200) ? 'Success' : 'Error')
+                . ' Sequence number: ' . $request->getPost('sequence_no')
+                . ' Url: ' . $this->getUrl($settings)
+                . ' Request time: ' . $millisBefore
+                . ' Request latency: ' . ($millisAfter - $millisBefore)
+            );
+        } else {
+            $this->logger->log(
+                'CartDefenderSenderController->sendAction',
+                'Error - request not allowed.'
+            );
+        }
+        $this->logger->log('CartDefenderSenderController->sendAction', 'Done');
+        echo 'Done';
+    }
+
+    /**
+     * Returns whether the request is allowed for processing.
+     *
+     * @param object $request the request to check.
+     * @param array $settings Cart Defender configuration settings.
+     * @return bool whether the request is allowed for processing.
+     */
+    private function isRequestAllowed($request, $settings)
+    {
+        $isLocalRequest = $request->getPost('is_local_request');
+        $data = $request->getPost('data');
+        return $settings['enabled']            // CD plugin enabled?
+            && !empty($isLocalRequest)   // Is local request?
+            // Send key matches?
+            && ($settings['send_key'] === $request->getPost('send_key'))
+            && !empty($data);              // Data non-empty?
+    }
+
+    /**
+     * Returns the URL to which the data should be sent by this script.
+     *
+     * @param array $settings Cart Defender configuration settings.
+     * @return string URL to which the data should be sent by this script.
+     */
+    private function getUrl($settings)
+    {
+        $path = CDData::CD_PLUGIN_BIZ_API_PATH_START
+            . '/' . $this->getRequest()->getPost('correlation_id') . '/'
+            . CDData::CD_PLUGIN_BIZ_API_VERSION
+            . CDData::CD_PLUGIN_BIZ_API_PATH_END;
+        $useRawTestUrl = $settings['use_raw_test_url_for_biz_api'];
+        return $settings['test'] ? ($settings['test_server_url_start']
+            . ($useRawTestUrl ? '' : $path)) : (CDData::CD_HOST . $path);
+    }
+
+    /**
+     * Sends a POST request to Cart Defender servers.
+     *
+     * @param object $request the request to send.
+     * @param array $settings Cart Defender configuration settings.
+     * @return void
+     */
+    private function sendRequest($request, $settings)
+    {
+        $client = new Varien_Http_Client($this->getUrl($settings));
+        $client->setMethod(Varien_Http_Client::POST);
+        $client->setAuth($settings['api'], '', Zend_Http_Client::AUTH_BASIC);
+        $client->setRawData($request->getPost('data'));
+        $client->setEncType('application/json');
+        return $client->request();
+    }
+}
