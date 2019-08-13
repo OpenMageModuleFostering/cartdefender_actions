@@ -36,6 +36,23 @@ class CartDefender_Actions_CartDefenderSenderController
         parent::_construct();
         $this->logger = Mage::helper('actions/logger');
     }
+    
+    public function preDispatch()
+    {
+        $this->setFlag('', self::FLAG_NO_START_SESSION, 1);
+        $this->setFlag('', self::FLAG_NO_PRE_DISPATCH, 1);
+        parent::preDispatch();
+        return $this;
+    }
+    
+    public function postDispatch()
+    {
+        $this->setFlag('', self::FLAG_NO_START_SESSION, 1);
+        $this->setFlag('', self::FLAG_NO_POST_DISPATCH, 1);
+        parent::postDispatch();
+        return $this;
+    }
+
 
     /**
      * Synchronously sends the text data contained in the POST request
