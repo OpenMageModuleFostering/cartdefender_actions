@@ -27,7 +27,7 @@ class CartDefender_Actions_Model_EventBuilder
         $store = Mage::app()->getStore();
 
         $sessionData = $this->captureSessionData();
-        $cart = $this->captureCartData();
+        $cart = $this->captureCartData($eventName, $observerData);
         $fullOrders = $this->captureOrderData($observerData);
         $visitorData = $sessionData['visitor_data'];
         $event = array(
@@ -111,15 +111,30 @@ class CartDefender_Actions_Model_EventBuilder
      * obtained from the Magento cart.
      *
      * @return array various bits of data to be sent on each event,
-     *     obtained from the Magento cart.
+     *         obtained from the Magento cart.
      */
-    private function captureCartData()
+    private function captureCartData ($eventName, $observerData)
     {
-        return session_id()
-            ? $this->getCartFromQuote(
-                Mage::getSingleton('checkout/session')->getQuote()
-            )
-            : array(CDData::MISSING_VALUE);
+        if (session_id()) {
+            if ($eventName === 'checkout_cart_save_after') {
+                $cart = $observerData['cart'];
+                $quote = $cart->getQuote();
+            } elseif ($eventName === 'sales_quote_collect_totals_after') {
+                $quote = $observerData['quote'];
+            } elseif ($eventName === 'sales_quote_product_add_after') {
+                    $items = $observerData['items'];
+                    $firstItem = $items[0];
+                    $quote = $firstItem->getQuote();
+            } else {
+                $quote = Mage::getSingleton('checkout/cart')->getQuote();
+            }
+            $cartFromQuote = $this->getCartFromQuote($quote);
+            return $cartFromQuote;
+        } else {
+            return array(
+                    CDData::MISSING_VALUE
+            );
+        }
     }
 
     /**
@@ -197,34 +212,51 @@ class CartDefender_Actions_Model_EventBuilder
     private function captureOrderData($observerData)
     {
         $fullOrders = array(CDData::MISSING_VALUE);
-        if (!session_id() || !isset($observerData['order_ids'])) {
+        if (!session_id() || (!isset($observerData['order_ids']) && !isset($observerData['order'])) ) {
             return $fullOrders;
         }
-
+        
+        if (!isset($observerData['order_ids'])) {
+            $order = $observerData['order'];
+            $fullOrders[] = $this->getFullOrder($order);
+            
+            return $fullOrders;
+        }
+        
         $orderIds = $observerData['order_ids'];
         foreach ($orderIds as $orderId) {
-            $oneFullOrder = array();
-            $oneFullOrder['order_id'] = $orderId;
-
             $order = Mage::getModel('sales/order')->load($orderId);
-            $orderData = $this->removePersonalData($order->getData());
-            $oneFullOrder['order_data'] = $orderData;
-
-            $quoteId = $orderData['quote_id'];
-            $cartFromOrder = Mage::getModel('sales/quote')->load($quoteId);
-            $oneFullOrder['cart'] = $this->getCartFromQuote($cartFromOrder);
-
-            $items = $order->getAllVisibleItems();
-            $orderItems = array();
-            foreach ($items as $item) {
-                $itemData = $item->getData();
-                $orderItems[] = $itemData;
-            }
-            $oneFullOrder['order_items'] = $orderItems;
-
-            $fullOrders[] = $oneFullOrder;
+            $fullOrders[] = $this->getFullOrder($order);
         }
         return $fullOrders;
+    }
+
+    /**
+     * Return order data as an array including items and the related shopping cart.
+     * @param $order
+     * @return array various bits of data obtained from the Magento orders.
+     */
+    private function getFullOrder($order)
+    {
+        $oneFullOrder = array();
+        $oneFullOrder['order_id'] = $order->getId();
+        
+        $orderData = $this->removePersonalData($order->getData());
+        $oneFullOrder['order_data'] = $orderData;
+        
+        $quoteId = $orderData['quote_id'];
+        $cartFromOrder = Mage::getModel('sales/quote')->load($quoteId);
+        $oneFullOrder['cart'] = $this->getCartFromQuote($cartFromOrder);
+        
+        $items = $order->getAllVisibleItems();
+        $orderItems = array();
+        foreach ($items as $item) {
+            $itemData = $item->getData();
+            $orderItems[] = $itemData;
+        }
+        $oneFullOrder['order_items'] = $orderItems;
+        
+        return $oneFullOrder;
     }
 
     /**
