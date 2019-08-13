@@ -146,7 +146,7 @@ class CartDefender_Actions_Model_EventBuilder
                 $cartItems[] = $itemData;
             }
             if (! empty($productIds)) {
-                Mage::getResourceModel('catalog/product_collection')->setStore($storeId);
+                Mage::getResourceModel('catalog/product_collection')->setStore(Mage::app()->getStore()->getStoreId());
                 $collection = Mage::getResourceModel('catalog/product_collection');
                 
                 $prodCollection = Mage::getModel('catalog/product')->getCollection()
