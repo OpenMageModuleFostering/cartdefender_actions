@@ -84,11 +84,10 @@ class CartDefender_Actions_Block_Script extends Mage_Core_Block_Template
                 ->ensureCorrelationIdSet();
 
             $cdsvarData = array(
+                'cd_host' => $this->getHost(),
                 'api' => Mage::helper('actions')->getApi(),
                 'website_url' =>
                     Mage::getStoreConfig('web/unsecure/base_url', 0),
-                'app_software_name' => 'Magento ' . Mage::getEdition(),
-                'app_software_version' => Mage::getVersion(),
                 'website_id' => $website->getId(),
                 'website_code' => $website->getCode(),
                 'website_name' => $website->getName(),
@@ -110,6 +109,7 @@ class CartDefender_Actions_Block_Script extends Mage_Core_Block_Template
                     Mage::helper('checkout/url')->getCheckoutUrl(),
                 'multishipping_checkout_link' =>
                     Mage::helper('checkout/url')->getMSCheckoutUrl(),
+                'cart_link' => Mage::helper('checkout/cart')->getCartUrl(),
                 'request_route_name' =>
                     Mage::app()->getRequest()->getRouteName(),
                 'page_identifier' =>

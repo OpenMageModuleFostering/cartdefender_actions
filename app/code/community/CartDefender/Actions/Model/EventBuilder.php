@@ -55,6 +55,7 @@ class CartDefender_Actions_Model_EventBuilder
             'checkoutLink' => Mage::helper('checkout/url')->getCheckoutUrl(),
             'multishippingCheckoutLink' =>
             Mage::helper('checkout/url')->getMSCheckoutUrl(),
+            'cartLink' => Mage::helper('checkout/cart')->getCartUrl(),
             'visitorId' => isset($visitorData['visitor_id'])
                 ? $visitorData['visitor_id'] : CDData::MISSING_VALUE,
             'visitorData' => $visitorData,
@@ -130,9 +131,17 @@ class CartDefender_Actions_Model_EventBuilder
         $cartData = array();
         if (isset($quote)) {
             $cartData = $this->removePersonalData($quote->getData());
+            $productMediaConfig = Mage::getModel('catalog/product_media_config');
             $items = $quote->getAllVisibleItems();
             foreach ($items as $item) {
                 $itemData = $item->getData();
+                $productFromData = $itemData['product'];
+                $productUrl = Mage::getUrl($productFromData->getUrlPath(), array('_secure' => true, '_type' => 'direct_link'));
+                $itemData['product_url'] = $productUrl;
+                $itemData['base_image_url'] = $productMediaConfig->getMediaUrl($productFromData->getImage());
+                $itemData['small_image_url'] = $productMediaConfig->getMediaUrl($productFromData->getSmallImage());
+                $itemData['thumbnail_url'] = $productMediaConfig->getMediaUrl($productFromData->getThumbnail());
+                $itemData['product_data'] = $productFromData->getData();
                 $cartItems[] = $itemData;
             }
         } else {

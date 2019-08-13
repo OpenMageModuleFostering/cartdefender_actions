@@ -85,9 +85,11 @@ class CartDefender_Actions_CartDefenderSenderController
                 'CartDefenderSenderController->sendAction',
                 'Error - request not allowed.'
             );
+            exit;
         }
         $this->logger->log('CartDefenderSenderController->sendAction', 'Done');
         echo 'Done';
+        exit;
     }
 
     /**

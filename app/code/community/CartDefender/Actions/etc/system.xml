@@ -12,7 +12,7 @@
 <config>
     <sections>
         <actions translate="label" module="actions">
-            <label>Cart Defender Popups</label>
+            <label>Cart Defender Persuasion Tools</label>
             <tab>sales</tab>
             <frontend_type>text</frontend_type>
             <sort_order>1</sort_order>
@@ -27,12 +27,12 @@
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
-                    <comment><![CDATA[ <p>You can configure the Cart Defender's Magento Extension settings
+                    <comment><![CDATA[ <p>You can configure the Cart Defender's Persuasion Tools settings
                              in this section. </p>
-                             <p>To register for Cart Defender's service and enable the Bot on your website
+                             <p>To register for Cart Defender's service and enable the AI on your website
                              <a href="https://portal.cartdefender.com/#!register"
                              target="_blank">go to the registration page</a>.</p>
-                             <p> To configure your Bot's messages <a href="https://portal.cartdefender.com"
+                             <p> To configure your messages and product recommendations <a href="https://portal.cartdefender.com"
                              target="_blank">go to the Cart Defender Portal</a>.</p>
                               ]]>
                     </comment>
@@ -73,7 +73,7 @@
                         </test>
                         <!-- Don't use a trailing slash in test server URL.-->
                         <test_server_url_start>
-                            <label>Test server URL protocol, domain, and path prefix (if any)</label>
+                            <label>Send data to this URL: protocol, domain, and path prefix if any (e.g. http://localhost)</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>5</sort_order>
                             <show_in_default>1</show_in_default>
@@ -86,7 +86,7 @@
                              like "/plugin/<correlation id>/v1-beta/bizEvent". This is useful for
                              inspecting biz event JSONs with something like RequestBin. -->
                         <use_raw_test_url_for_biz_api>
-                            <label>Use unadorned test server URL for JSON API</label>
+                            <label>Use unadorned target server URL for JSON API</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>6</sort_order>

@@ -64,7 +64,7 @@ class CartDefender_Actions_Model_AsyncLocalSender extends Varien_Object
             $remoteSenderConf['port'],
             $errno,
             $errstr,
-            0.5 /*timeout*/
+            0.2 /*timeout*/
         );
         $success = fwrite($socket, $request);
         Mage::getSingleton('core/session')->setLastEventTime(time());
