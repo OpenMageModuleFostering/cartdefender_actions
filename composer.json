@@ -1,0 +1,16 @@
+{
+    "name": "OpenMageModuleFostering/cartdefender_actions",
+    "type": "magento-module",
+    "license": "Open-Software-License-(OSL)",
+    "homepage": "",
+    "description": "Increase sales with smart targeted popups and offers delivered to your visitors in real time.",
+    "authors": [
+    {
+        "name": "Radoslaw Gliniecki",
+        "email": "radek@cartdefender.com"
+    }
+],
+    "suggest": {
+        "magento-hackathon/magento-composer-installer": "*"
+    }
+}

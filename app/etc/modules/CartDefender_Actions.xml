@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Cart Defender Actions plugin for Magento 
+ *
+ * @package     CartDefender_Actions
+ * @author      Heptium Ltd. 
+ * @copyright   Copyright (c) 2016 Heptium Ltd.  (http://www.cartdefender.com/)
+ * @license     Open Software License
+ */
+-->
+<config>
+    <modules>
+        <CartDefender_Actions>
+            <active>true</active>
+            <codePool>community</codePool>
+        </CartDefender_Actions>
+    </modules>
+</config>
