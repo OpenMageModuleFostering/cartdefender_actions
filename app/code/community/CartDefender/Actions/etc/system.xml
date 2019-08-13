@@ -27,6 +27,15 @@
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
+                    <comment><![CDATA[ <p>You can configure the Cart Defender's Magento Extension settings 
+                             in this section. </p> 
+                             <p>To register for Cart Defender's service and enable the Bot on your website 
+                             <a href="https://portal.cartdefender.com/#!register" 
+                             target="_blank">go to the registration page</a>.</p> 
+                             <p> To configure your Bot's messages <a href="https://portal.cartdefender.com" 
+                             target="_blank">go to the Cart Defender Portal</a>.</p>
+                              ]]>
+                    </comment>
                     <fields>
                         <enabled translate="label">
                             <label>Enabled</label>

@@ -209,6 +209,32 @@ class CartDefender_Actions_Model_Observer extends Varien_Event_Observer {
     return $full_orders;
   }
 
+  private function utf8ize($mixed, &$objects_done) {
+    if (!in_array($mixed, $objects_done, true)) {
+      if (is_array($mixed)) {
+        $objects_done[] = $mixed;
+        foreach ($mixed as $key => $value) {
+          $mixed[$key] = $this->utf8ize($value, $objects_done);
+        }
+      } else if (is_string($mixed)) {
+        if (!mb_detect_encoding($mixed, 'utf-8', true)) {
+          $mixed = utf8_encode($mixed);
+          return $mixed;
+        } else {
+          return $mixed;
+        }
+      } else if (is_object($mixed)) {
+        $objects_done[] = $mixed;
+        foreach ($mixed as $key => $value) {
+          $mixed->$key = $this->utf8ize($value, $objects_done);
+        }
+      }
+      return $mixed;
+    } else {
+      return $mixed;
+    }
+  }
+
   private function prepareBizEventData($event_name, $observer_data, $async_sender_api, $event_no) {
     $website =  Mage::app()->getWebsite(); // Gets the current website details
     $store = Mage::app()->getStore(); // Gets the current store's details  
@@ -250,7 +276,8 @@ class CartDefender_Actions_Model_Observer extends Varien_Event_Observer {
         'customerData' => $customerData,
         'previousBizEventLatency' => $this->MISSING_VALUE
     );
-    return Zend_Json::encode($event, true);
+    $objects_done = array();
+    return Zend_Json::encode($this->utf8ize($event, $objects_done), true);
   }
 
   private function shouldSendSessionState() {
