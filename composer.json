@@ -1,7 +1,7 @@
 {
-    "name": "OpenMageModuleFostering\/cartdefender_actions",
+    "name": "openmage-module-fostering\/cartdefender_actions",
     "type": "magento-module",
-    "license": "Open-Software-License-(OSL)",
+    "license": "OSL-3.0",
     "homepage": "",
     "description": "Increase sales with this state-of-the-art product recommendations and targeted popups, including a FREE exit intent message. Engage your visitors in real time or later via email!",
     "authors": [
